@@ -15,9 +15,18 @@
 
 class backup_restore_divi_theme_options {
 
+	/**
+	 * Constructor function for the class. 
+	 * Very first function which will get called when plugin is active.
+	 * Calling admin_menu hook to add a submenu page under Tools main menu. 
+	 * /
 	function backup_restore_divi_theme_options() {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 	}
+	
+	/**
+	 * Adding menu items on the admin side under Tools main menu.
+	 * /
 	function admin_menu() {
 
 		$page = add_submenu_page('tools.php', 'Backup/Restore Theme Options', 'Backup/Restore Theme Options', 'manage_options', 'backup-restore-divi-theme-options', array(&$this, 'options_page'));
@@ -27,6 +36,12 @@ class backup_restore_divi_theme_options {
 		add_submenu_page( 'et_divi_options',__( 'Backup/Restore Theme Options', 'Divi' ), __( 'Backup/Restore Theme Options', 'Divi' ), 'manage_options', 'tools.php?page=backup-restore-divi-theme-options', 'backup-restore-divi-theme-options' );
 
 	}
+	
+	/**
+	 * Processing the import or export requests.
+	 * For the export request it is giving a ".dat" file to download which holds all data ready to import.
+	 * For the import request it is reading a file and will add all Divi theme options values into the database
+	 * /
 	function import_export() {
 		if (isset($_GET['action']) && ($_GET['action'] == 'download')) {
 			header("Cache-Control: public, must-revalidate");
@@ -51,6 +66,11 @@ class backup_restore_divi_theme_options {
 			exit;
 		}
 	}
+	
+	/**
+	 * Giving an interface on the admin side to download serialized ".dat" file
+	 * Also giving an interface where admin can upload the file to import data for Divi theme
+	 * /
 	function options_page() { ?>
 
 		<div class="wrap">
@@ -78,9 +98,19 @@ class backup_restore_divi_theme_options {
 		</div>
 
 	<?php }
+	
+	/**
+	 * Retrieving all saved options for the Divi theme and unserializing it.
+	 * /
 	function _display_options() {
 		$options = unserialize($this->_get_options());
 	}
+	
+	/**
+	 * Retrieving all saved options for the Divi theme
+	 * 
+	 * @return WPDB results
+	 * /
 	function _get_options() {
 		global $wpdb;
 		return $wpdb->get_results("SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name = 'et_divi'"); // edit 'shapeSpace_options' to match theme options
